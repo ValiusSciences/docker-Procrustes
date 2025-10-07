@@ -12,7 +12,7 @@ RUN wget https://github.com/BostonGene/Procrustes/archive/refs/tags/1.0.1.tar.gz
 COPY ./pyproject.toml /opt/Procrustes-1.0.1/
 
 RUN cd /opt/Procrustes-1.0.1/ && \
-    pip install . && \
+    /usr/local/bin/pip install . && \
     rm -rf /opt/Procrustes-1.0.1 /opt/Procrustes-1.0.1.tar.gz
 
 # Deploy the target tools into a base image
