@@ -1,3 +1,9 @@
-# Project/Repo Title
+# docker-Procrustes
 
-Template Repository for the Valius Sciences Dockerfiles. Describe a simple overview of use/purpose here.
+This repository contains the Dockerfile to build the container image for Procrustes.
+
+Pull the dev image using comamnd below:
+
+```bash
+docker pull ghcr.io/valiussciences/procrustes:dev
+```
