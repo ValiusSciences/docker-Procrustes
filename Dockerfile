@@ -1,25 +1,27 @@
-ARG MINIFORGE_VERSION=22.9.0-2
-ARG UBUNTU_VERSION=23.04
-
-FROM condaforge/mambaforge:${MINIFORGE_VERSION} AS builder
+FROM condaforge/mambaforge:23.3.1-1 AS builder
 
 # Use mamba to install tools and dependencies into /usr/local
-ARG TOOL_VERSION=X.X.X
 RUN mamba create -qy -p /usr/local \
     -c bioconda \
     -c conda-forge \
-    tool_name==${TOOL_VERSION}
+    python=3.11
+
+RUN wget https://github.com/BostonGene/Procrustes/archive/refs/tags/1.0.1.tar.gz -O /opt/Procrustes-1.0.1.tar.gz && \
+    tar -xzf /opt/Procrustes-1.0.1.tar.gz -C /opt
+
+COPY ./pyproject.toml /opt/Procrustes-1.0.1/
+
+RUN cd /opt/Procrustes-1.0.1/ && \
+    pip install . && \
+    rm -rf /opt/Procrustes-1.0.1 /opt/Procrustes-1.0.1.tar.gz
 
 # Deploy the target tools into a base image
-FROM ubuntu:${UBUNTU_VERSION} AS final
+FROM ubuntu:20.04
 COPY --from=builder /usr/local /usr/local
 
-# Add a new user/group called bldocker
-RUN groupadd -g 500001 bldocker && \
-    useradd -r -u 500001 -g bldocker bldocker
+# # ps and command for reporting mertics
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y procps &&\
+    rm -rf /var/lib/apt/lists/*
 
-# Change the default user to bldocker from root
-USER bldocker
-
-LABEL   maintainer="Your Name <YourName@mednet.ucla.edu>" \
-        org.opencontainers.image.source=https://github.com/uclahs-cds/<REPO>
+LABEL maintainer="Trevor Zhu <trevoer@valiussciences.com>"
